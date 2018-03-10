@@ -20,25 +20,50 @@ public class Login extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/login.jsp").forward(req,resp);
+        req.getRequestDispatcher("/login.jsp").forward(req, resp);
 
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-        String user = request.getParameter("user");
-        String pass = request.getParameter("pass");
+        if (request.getParameter("loginButton") != null)
+            login(request, response);
+        else if (request.getParameter("registerButton") != null)
+            redirectToRegister(request, response);
+    }
 
-        try (PrintWriter w = response.getWriter()) {
+    private void login(HttpServletRequest req, HttpServletResponse resp) {
+        String user = req.getParameter("user");
+        String pass = req.getParameter("pass");
+
+        try (PrintWriter pw = resp.getWriter()) {
+
+            Class.forName("org.sqlite.JDBC");
 
             Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/dbdb");
-            PreparedStatement ins = conn.prepareStatement("INSERT INTO names(name) VALUES (?)");
-            ins.setString(1,user);
-            ins.executeUpdate();
+
+            if (Queries.checkPassword(conn, user, pass)) {
+                req.getSession().setAttribute("loggedInUser", user);
+                resp.sendRedirect(req.getContextPath() + "/");
+            } else {
+                pw.append("The password is incorrect. Please try again.");
+                req.getSession().setAttribute("loggedInUser", null);
+            }
             conn.close();
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void redirectToRegister(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            resp.sendRedirect(req.getContextPath() + "/register");
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

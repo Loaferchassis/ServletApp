@@ -14,7 +14,8 @@
     <form method="post" action="register">
         Enter username :<input type="text" name="userName" /><br/><br/>
         Enter password :<input type="password" name="password" /><br/><br/>
-        <input type="submit" value="Registration" />
+        <input type="submit" value="Submit" name="registerButton" />
+        <input type="submit" value="LogIn" name="loginButton" />
     </form>
   </body>
 </html>

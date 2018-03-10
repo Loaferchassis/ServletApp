@@ -10,6 +10,14 @@ public class Queries {
         return statement.executeQuery();
     }
 
+    public static boolean checkPassword(Connection connection, String login, String password) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT password FROM login_info WHERE login IS ?");
+        statement.setString(1, login);
+        if (password.equals(statement.executeQuery().getString("password")))
+            return true;
+        else return false;
+    }
+
     /**
      * Returns:
      * 0 - Error

@@ -19,6 +19,15 @@ public class Registration extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html");
 
+        if (req.getParameter("registerButton") != null)
+            register(req, resp);
+        else if (req.getParameter("loginButton") != null)
+            redirectToLogin(req, resp);
+
+
+    }
+
+    private void register(HttpServletRequest req, HttpServletResponse resp) {
         String user = req.getParameter("userName");
         String pass = req.getParameter("password");
 
@@ -38,9 +47,10 @@ public class Registration extends HttpServlet {
                 pw.append("Password must be at least 5 characters long. Please try again.");
             else if (response == 2)
                 pw.append("This name is already taken. Please try a different one.");
-            else if (response == 1)
+            else if (response == 1) {
                 pw.append("Account created");
-            else if (response == 0)
+                resp.sendRedirect(req.getContextPath() + "/login");
+            } else if (response == 0)
                 pw.append("Error occurred. Please try again.");
 
             conn.close();
@@ -48,8 +58,16 @@ public class Registration extends HttpServlet {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            resp.sendRedirect(req.getContextPath() + "/login");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
