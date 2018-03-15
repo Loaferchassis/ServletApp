@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Queries {
 
@@ -51,10 +52,10 @@ public class Queries {
          * Check password length
          */
 
-        if(login.isEmpty())
+        if (login.isEmpty())
             return 4;
 
-        if (password.length() <= 5)
+        if (password.length() < 5)
             return 3;
 
         /**
@@ -76,6 +77,36 @@ public class Queries {
         else return 1;
     }
 
+    /**
+     * taskType parameter:
+     * 0 - only unfinished tasks
+     * 1 - only finished tasks
+     * 2 - all tasks
+     *
+     * @param connection
+     * @param user
+     * @param taskType
+     * @return
+     */
+    public static ArrayList<String> getUserTasks(Connection connection, String user, int taskType) throws SQLException {
+        ArrayList<String> returnList = new ArrayList<>();
+        PreparedStatement statement;
+
+        if (taskType == 2) {
+            statement = connection.prepareStatement("SELECT task FROM tasks WHERE user = ?");
+        } else {
+            statement = connection.prepareStatement("SELECT task FROM tasks WHERE user = ? AND is_done= ?");
+            statement.setInt(2, taskType);
+        }
+        statement.setString(1, user);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()) {
+            returnList.add(rs.getString("task"));
+        }
+        return returnList;
+
+    }
+
     public static boolean addTask(Connection connection, String user, String task) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO tasks(user,task,is_done) VALUES (?,?,0)");
         statement.setString(1, user);
@@ -87,7 +118,7 @@ public class Queries {
 
     public static boolean deleteTask(Connection connection, Integer id) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM tasks WHERE id=?");
-        if(statement.executeUpdate()== 0)
+        if (statement.executeUpdate() == 0)
             return false;
         else return true;
 
