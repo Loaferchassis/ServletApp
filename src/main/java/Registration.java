@@ -37,13 +37,15 @@ public class Registration extends HttpServlet {
 
             Class.forName("org.sqlite.JDBC");
 
-            conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/dbdb");
+            conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
 
             /**
              * Handle user mistakes.
              */
             int response = Queries.instertLoginPassword(conn, user, pass);
-            if (response == 3)
+            if (response == 4)
+                pw.append("Username should not be empty. Please try again.");
+            else if (response == 3)
                 pw.append("Password must be at least 5 characters long. Please try again.");
             else if (response == 2)
                 pw.append("This name is already taken. Please try a different one.");

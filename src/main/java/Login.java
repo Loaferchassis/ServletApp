@@ -41,13 +41,16 @@ public class Login extends HttpServlet {
 
             Class.forName("org.sqlite.JDBC");
 
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/dbdb");
-
-            if (Queries.checkPassword(conn, user, pass)) {
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
+            int response = Queries.checkPassword(conn, user, pass);
+            if (response == 1) {
                 req.getSession().setAttribute("loggedInUser", user);
                 resp.sendRedirect(req.getContextPath() + "/");
-            } else {
+            } else if (response == 0) {
                 pw.append("The password is incorrect. Please try again.");
+                req.getSession().setAttribute("loggedInUser", null);
+            } else {
+                pw.append("There is no user with such Username. Please try again.");
                 req.getSession().setAttribute("loggedInUser", null);
             }
             conn.close();
