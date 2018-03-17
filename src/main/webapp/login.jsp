@@ -13,9 +13,9 @@
 </head>
 <body>
 <form method="post" action="login">
-    Username :<input type="text" name="user"/><br/><br/>
-    Password :<input type="password" name="pass"/><br/><br/>
-    <input type="submit" value="Login" name="loginButton" />
+    Username :<input type="text" value="Alexander" name="user"/><br/><br/>
+    Password :<input type="password" value="qwerty" name="pass"/><br/><br/>
+    <input type="submit" value="Login" name="loginButton"/>
     <input type="submit" value="Register" name="registerButton"/>
 </form>
 <p>${requestScope.get("errorReport")}</p>

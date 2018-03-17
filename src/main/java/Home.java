@@ -1,4 +1,5 @@
 
+import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Home extends HttpServlet {
@@ -23,7 +25,7 @@ public class Home extends HttpServlet {
         if (session == null || session.getAttribute("loggedInUser") == null)
             resp.sendRedirect(req.getContextPath() + "/login");
         else {
-            printTasks(req, (String) req.getSession().getAttribute("loggedInUser"));
+            printTasks(req, (String) req.getSession().getAttribute("loggedInUser"), 2);
             req.getRequestDispatcher("/home.jsp").forward(req, resp);
         }
     }
@@ -32,9 +34,19 @@ public class Home extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html");
         if (req.getParameter("submitTask") != null) {
-            log.info("Login button pressed.");
+            log.info("Add task button pressed.");
             submitTask(req, resp);
+        } else if (req.getParameter("setDone") != null) {
+            log.info("Done button pressed.");
+            if (setDoneOrDelete(req, 0) == false)
+                log.warn("Task is NOT setDone!");
+        } else if (req.getParameter("delete") != null) {
+            log.info("Delete button pressed.");
+            if (setDoneOrDelete(req, 1) == false)
+                log.warn("Task is NOT deleted!");
         }
+        printTasks(req, (String) req.getSession().getAttribute("loggedInUser"), 2);
+        req.getRequestDispatcher("/home.jsp").forward(req, resp);
     }
 
     private void submitTask(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -44,8 +56,6 @@ public class Home extends HttpServlet {
             String task = req.getParameter("task");
             String userName = (String) req.getSession().getAttribute("loggedInUser");
             Queries.addTask(conn, userName, task);
-            printTasks(req, userName);
-            req.getRequestDispatcher("/home.jsp").forward(req, resp);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -53,11 +63,11 @@ public class Home extends HttpServlet {
         }
     }
 
-    private void printTasks(HttpServletRequest req, String userName) {
+    private void printTasks(HttpServletRequest req, String userName, int taskType) {
         try {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
-            ArrayList<String> list = Queries.getUserTasks(conn, userName, 0);
+            ArrayList<TaskObject> list = Queries.getUserTasks(conn, userName, taskType);
             req.setAttribute("list", list);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -66,4 +76,34 @@ public class Home extends HttpServlet {
         }
 
     }
+
+    /**
+     * 0 - setDoneUnDone
+     * 1 - SetUnDone
+     * 2 - delete
+     *
+     * @param req
+     * @param action
+     */
+    private boolean setDoneOrDelete(HttpServletRequest req, int action) {
+        try {
+            String obj = req.getParameter("hiddenValue");
+            Class.forName("org.sqlite.JDBC");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
+            if (action == 0)
+                if (Queries.isTaskDone(conn, Integer.valueOf(obj)))
+                    return Queries.setTaskDoneUnDone(conn, Integer.valueOf(obj), 0);
+                else return Queries.setTaskDoneUnDone(conn, Integer.valueOf(obj), 1);
+
+            else if (action == 1)
+                return Queries.deleteTask(conn, Integer.valueOf(obj));
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
+

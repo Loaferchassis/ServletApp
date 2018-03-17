@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -88,20 +90,21 @@ public class Queries {
      * @param taskType
      * @return
      */
-    public static ArrayList<String> getUserTasks(Connection connection, String user, int taskType) throws SQLException {
-        ArrayList<String> returnList = new ArrayList<>();
+    public static ArrayList<TaskObject> getUserTasks(Connection connection, String user, int taskType) throws SQLException {
+        ArrayList<TaskObject> returnList = new ArrayList<>();
         PreparedStatement statement;
 
         if (taskType == 2) {
-            statement = connection.prepareStatement("SELECT task FROM tasks WHERE user = ?");
+            statement = connection.prepareStatement("SELECT id, user, task, is_done FROM tasks WHERE user = ?");
         } else {
-            statement = connection.prepareStatement("SELECT task FROM tasks WHERE user = ? AND is_done= ?");
+            statement = connection.prepareStatement("SELECT id, user, task, is_done FROM tasks WHERE user = ? AND is_done= ?");
             statement.setInt(2, taskType);
         }
         statement.setString(1, user);
         ResultSet rs = statement.executeQuery();
         while (rs.next()) {
-            returnList.add(rs.getString("task"));
+            returnList.add(new TaskObject(rs.getInt("id"), rs.getString("user"),
+                    rs.getString("task"), rs.getInt("is_done")));
         }
         return returnList;
 
@@ -118,17 +121,38 @@ public class Queries {
 
     public static boolean deleteTask(Connection connection, Integer id) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM tasks WHERE id=?");
+        statement.setInt(1, id);
         if (statement.executeUpdate() == 0)
             return false;
         else return true;
 
     }
 
-    public static boolean setTaskDone(Connection connection, Integer id) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE tasks SET is_done=1 WHERE id=?");
-        statement.setInt(1, id);
+    /**
+     * done:
+     * 0 - UNDO
+     * 1 - DONE
+     *
+     * @param connection
+     * @param id
+     * @param done
+     * @return
+     * @throws SQLException
+     */
+    public static boolean setTaskDoneUnDone(Connection connection, Integer id, Integer done) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE tasks SET is_done=? WHERE id=?");
+        statement.setInt(1, done);
+        statement.setInt(2, id);
         if (statement.executeUpdate() == 0)
             return false;
         else return true;
+    }
+
+    public static boolean isTaskDone(Connection connection, Integer id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT is_done FROM tasks WHERE id = ?");
+        statement.setInt(1, id);
+        if (statement.executeQuery().getInt("is_done") == 1)
+            return true;
+        else return false;
     }
 }
