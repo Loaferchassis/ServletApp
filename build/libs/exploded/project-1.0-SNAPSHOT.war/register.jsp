@@ -17,5 +17,6 @@
         <input type="submit" value="Submit" name="registerButton" />
         <input type="submit" value="LogIn" name="loginButton" />
     </form>
+    <p>${requestScope.get("errorReport")}</p>
   </body>
 </html>

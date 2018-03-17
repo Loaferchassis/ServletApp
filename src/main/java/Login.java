@@ -48,11 +48,15 @@ public class Login extends HttpServlet {
         String user = req.getParameter("user");
         String pass = req.getParameter("pass");
 
-        try (PrintWriter pw = resp.getWriter()) {
-
+        try {
             Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
+
+        try (Connection conn = DriverManager.getConnection(Constants.dbPath)) {
+
             int response = Queries.checkPassword(conn, user, pass);
             if (response == 1) {
                 log.info("Successful Log in.");
@@ -74,10 +78,8 @@ public class Login extends HttpServlet {
         } catch (SQLException e) {
             log.error(e.getMessage());
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             log.error(e.getMessage());
             e.printStackTrace();
         }

@@ -52,21 +52,25 @@ public class Home extends HttpServlet {
     private void submitTask(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
-            String task = req.getParameter("task");
-            String userName = (String) req.getSession().getAttribute("loggedInUser");
-            Queries.addTask(conn, userName, task);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+
+        try (Connection conn = DriverManager.getConnection(Constants.dbPath)
+        ) {
+            String task = req.getParameter("task");
+            if ("".equals(task))
+                return;
+            String userName = (String) req.getSession().getAttribute("loggedInUser");
+            Queries.addTask(conn, userName, task);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private void printTasks(HttpServletRequest req, String userName, int taskType) {
-        try {
+        try (Connection conn = DriverManager.getConnection(Constants.dbPath)) {
             Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
             ArrayList<TaskObject> list = Queries.getUserTasks(conn, userName, taskType);
             req.setAttribute("list", list);
         } catch (ClassNotFoundException e) {
@@ -87,19 +91,21 @@ public class Home extends HttpServlet {
      */
     private boolean setDoneOrDelete(HttpServletRequest req, int action) {
         try {
-            String obj = req.getParameter("hiddenValue");
             Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/Alexander/IdeaProjects/javacore_project/src/db");
-            if (action == 0)
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try (Connection conn = DriverManager.getConnection(Constants.dbPath)) {
+            String obj = req.getParameter("hiddenValue");
+            if ("undefined".equals(obj) || obj == null)
+                return false;
+            if (action == 0 && obj!="undefined")
                 if (Queries.isTaskDone(conn, Integer.valueOf(obj)))
                     return Queries.setTaskDoneUnDone(conn, Integer.valueOf(obj), 0);
                 else return Queries.setTaskDoneUnDone(conn, Integer.valueOf(obj), 1);
-
-            else if (action == 1)
+            else if (action == 1 && obj!="undefined")
                 return Queries.deleteTask(conn, Integer.valueOf(obj));
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -4,59 +4,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
-    <!-- To save as "hello\WEB-INF\web.xml" -->
-
-    <!--<servlet>-->
-    <!--<servlet-name>HelloWorld</servlet-name>-->
-    <!--<servlet-class>HelloServlet</servlet-class>-->
-    <!--</servlet>-->
-
-    <!--&lt;!&ndash; Note: All <servlet> elements MUST be grouped together and-->
-    <!--placed IN FRONT of the <servlet-mapping> elements &ndash;&gt;-->
-
-    <servlet>
-        <servlet-name>UserInfo</servlet-name>
-        <servlet-class>Main</servlet-class>
-    </servlet>
-
-
-    <!--<servlet-mapping>-->
-    <!--<servlet-name>HelloWorld</servlet-name>-->
-    <!--<url-pattern>/sayhello</url-pattern>-->
-    <!--</servlet-mapping>-->
-
-    <servlet-mapping>
-        <servlet-name>UserInfo</servlet-name>
-        <url-pattern>/user</url-pattern>
-    </servlet-mapping>
-
-
-    <!--<security-constraint>-->
-    <!--<web-resource-collection>-->
-    <!--<web-resource-name>Wildcard means whole app requires authentication</web-resource-name>-->
-    <!--<url-pattern>/*</url-pattern>-->
-    <!--<http-method>GET</http-method>-->
-    <!--<http-method>POST</http-method>-->
-    <!--</web-resource-collection>-->
-
-    <!--<auth-constraint>-->
-    <!--<role-name>dev</role-name>-->
-    <!--</auth-constraint>-->
-
-    <!--<user-data-constraint>-->
-    <!--&lt;!&ndash; transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE &ndash;&gt;-->
-    <!--<transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
-    <!--</user-data-constraint>-->
-    <!--</security-constraint>-->
-
-    <!--<login-config>-->
-    <!--<auth-method>FORM</auth-method>-->
-    <!--<form-login-config>-->
-    <!--<form-login-page>/login.html</form-login-page>-->
-    <!--<form-error-page>/login-failed.html</form-error-page>-->
-    <!--</form-login-config>-->
-    <!--</login-config>-->
-
 
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
@@ -77,7 +24,6 @@
     <servlet-mapping>
         <servlet-name>RegisterServlet</servlet-name>
         <url-pattern>/register</url-pattern>
-
     </servlet-mapping>
 
     <servlet>

@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <html>
-<head><title>Project</title></head>
+<head><title>Home</title></head>
 <body>
 ${pageContext.request.userPrincipal.name}
 <form method="post" action="addTask">
@@ -37,17 +37,6 @@ ${pageContext.request.userPrincipal.name}
             document.forms.checkboxes.hiddenValue.value = ret;
 
         }
-
-
-
-
-
-
-
-
-
-
-
 </script>
 </body>
 </html>
